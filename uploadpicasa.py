@@ -61,6 +61,7 @@ class TUploadPicasa:
 		self.options.login = None
 		self.options.password = None
 		self.options.targetalbum = None
+		self.options.mode = 'upload'
 
 
 	#
@@ -245,7 +246,7 @@ Content-Type: image/jpeg
 
 		# Configure parser
 		parser = OptionParser(
-			usage="usage: %prog [options] FILE [FILE] [FILE]",
+			usage="usage: %prog [options] [FILE] [FILE] [FILE]",
 			version="%prog 1.0")
 		# "-h", "--help" supplied automatically by OptionParser
 		parser.add_option( "-v", "--verbose", dest="verbose",
@@ -263,19 +264,23 @@ Content-Type: image/jpeg
 		parser.add_option( "-a", "--album", dest="targetalbum",
 			metavar="ALBUM", type='string', default=self.options.targetalbum,
 			help="the destination picasa album [default:%default]")
+		parser.add_option( "", "--list", dest="mode",
+			action="store_const", const="list",
+			help="list albums")
 
 		# Run the parser
 		(self.options, args) = parser.parse_args( self.argv[1:] )
 
 		# Ensure that we have the parameters we need
-		if len(args) != 1:
-			parser.error("You must supply the name of a FILE to upload")
+		if not self.options.login or not self.options.password:
+			parser.error("You must supply a USERNAME and PASSWORD to login")
+
+		if len(args) != 1 or self.options.mode == 'list':
+			self.options.mode = 'list'
+			return
 
 		if not self.options.targetalbum:
 			parser.error("You must supply the name of an ALBUM to upload to")
-
-		if not self.options.login or not self.options.password:
-			parser.error("You must supply a USERNAME and PASSWORD to login")
 
 		# Copy the positional arguments into self
 		self.filenames = args
