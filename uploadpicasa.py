@@ -96,12 +96,16 @@ class TUploadPicasa:
 		auth_headers = {'Content-Type': 'application/x-www-form-urlencoded'}
 		auth_request = "Email=%s&Passwd=%s&service=lh2" % (self.options.login, self.options.password)
 
+		if self.options.verbose:
+			print "---- Authenticating"
+
 		# Make the request
 		response, content = self.http.request(auth_url, 'POST',
 			body=auth_request, headers=auth_headers)
 
-		print response
-		print content
+		if self.options.verbose:
+			print "RX:",content
+			print "RX:",response
 
 		if response['status'] == '200':
 			self.authtoken = re.search('Auth=(\S*)', content).group(1)
