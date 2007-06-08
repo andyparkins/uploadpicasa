@@ -206,7 +206,30 @@ Content-Type: image/jpeg
 		self.options.targetalbum = None
 
 		# Read overriding defaults from the config file
+		home = os.getenv('HOME');
+		try:
+			fconfig = open(home+'/.uploadpicasarc', mode='r')
+		except IOError:
+			return
 
+		config = fconfig.read();
+
+		config = config.split("\n");
+
+		for line in config:
+			if len(line) == 0:
+				continue
+			splitline = line.split('=')
+			param = splitline[0].strip()
+			value = ".".join(splitline[1:]).strip()
+			if param == 'login':
+				self.options.login = value
+			elif param == 'password':
+				self.options.password = value
+			elif param == 'targetwidth':
+				self.options.targetsize = value
+			elif param == 'album':
+				self.options.targetalbum = value
 
 	#
 	# Function:		readCommandLine
@@ -236,7 +259,7 @@ Content-Type: image/jpeg
 			help="the width the image should be in picasa [default:%default]")
 		parser.add_option( "-a", "--album", dest="targetalbum",
 			metavar="ALBUM", type='string', default=self.options.targetalbum,
-			help="the destination picasa album")
+			help="the destination picasa album [default:%default]")
 
 		# Run the parser
 		(self.options, args) = parser.parse_args( self.argv[1:] )
