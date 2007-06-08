@@ -225,7 +225,11 @@ Content-Type: image/jpeg
 		response, content = self.http.request( url, 'POST',
 			headers=headers,body=image )
 		if response['status'] == '404':
-			raise TUPError(content)
+			self.createAlbum()
+			response, content = self.http.request( url, 'POST',
+				headers=headers,body=image )
+			if response['status'] == '404':
+				raise TUPError(content)
 
 		# Check for a redirect
 		while response['status'] == '302':
@@ -241,6 +245,44 @@ Content-Type: image/jpeg
 			os.system('rm /tmp/tmp.jpg')
 
 		print " - upload of", namenice, "complete"
+
+	#
+	# Function:		createAlbum
+	# Description:
+	#  Create the target album
+	#
+	def createAlbum( self ):
+		if not self.authtoken:
+			raise TUPError("Not logged in while attempting upload")
+		if not self.options.targetalbum:
+			raise TUPError("You must supply an album name to upload to")
+
+		# URL to album
+		url = 'http://picasaweb.google.com/data/feed/api/user/%s' % (self.options.login)
+		summary = ""
+		content = """
+<entry xmlns='http://www.w3.org/2005/Atom'
+xmlns:media='http://search.yahoo.com/mrss/'
+xmlns:gphoto='http://schemas.google.com/photos/2007'>
+<title type='text'>%s</title>
+<summary type='text'>%s</summary>
+<gphoto:access>public</gphoto:access>
+<gphoto:commentingEnabled>true</gphoto:commentingEnabled>
+<category scheme='http://schemas.google.com/g/2005#kind'
+term='http://schemas.google.com/photos/2007#album'></category>
+</entry>
+""" % ( self.options.targetalbum, summary )
+		headers = {
+			'Authorization': 'GoogleLogin auth=%s' % self.authtoken.strip(),
+			'Content-Length':'%s' % len(content),
+			'Content-Type': 'application/atom+xml'
+		}
+
+		if self.options.verbose:
+			print "--- Creating album", self.options.targetalbum
+		response, content = self.http.request(url, 'POST', headers=headers, body=content)
+		if response['status'] != '201':
+			raise TUPError(content)
 
 	#
 	# Function:		readConfigFile
