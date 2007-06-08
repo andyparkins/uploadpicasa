@@ -83,9 +83,13 @@ class TUploadPicasa:
 		# Establish authtoken
 		self.authenticate()
 
-		# Upload the files
-		for filename in self.filenames:
-			self.upload( filename )
+		# Run
+		if self.options.mode == 'list':
+			self.listAlbums()
+		else:
+			# Upload the files
+			for filename in self.filenames:
+				self.upload( filename )
 
 	#
 	# Function:		authenticate
@@ -128,6 +132,35 @@ class TUploadPicasa:
 #		fauth = open('/tmp/googleauth', mode='w')
 #		fauth.write(self.authtoken);
 #		fauth.close()
+
+	#
+	# Function:		listAlbums
+	# Description:
+	#  Return a list of albums
+	#
+	def listAlbums( self ):
+		if not self.options.login:
+			raise TUPError("No username supplied, so can't list albums")
+
+		url = 'http://picasaweb.google.com/data/feed/api/user/%s/?kind=album' % (self.options.login)
+
+		if self.authtoken:
+			headers = { 'Authorization': 'GoogleLogin auth=%s' % self.authtoken.strip() }
+		else:
+			headers = None
+
+		if self.options.verbose:
+			print "--- Listing albums for", self.options.login
+		response, content = self.http.request(url, 'GET', headers=headers)
+		if response['status'] == '404':
+			raise TUPError(content)
+		while response['status'] == '302':
+			response, content = self.http.request(response['location'], 'GET')
+			if response['status'] == '404':
+				raise TUPError(content)
+
+		for album in re.findall('<gphoto:name>(\S*)</gphoto:name>',content):
+			print album
 
 	#
 	# Function:		upload
