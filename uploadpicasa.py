@@ -83,9 +83,6 @@ class TUploadPicasa:
 		# Establish authtoken
 		self.authenticate()
 
-		if not self.authtoken:
-			raise TUPError("Couldn't log in")
-
 		# Upload the files
 		for filename in self.filenames:
 			self.upload( filename )
@@ -102,6 +99,12 @@ class TUploadPicasa:
 #			return
 #		except IOError:
 #			print "--- No cached authentication token found, new login"
+
+		self.authtoken = None
+
+		# Don't try to authenticate when no details supplied
+		if not self.options.login or not self.options.password:
+			return;
 
 		# Create the authentication request
 		auth_url = 'https://www.google.com/accounts/ClientLogin'
@@ -121,8 +124,6 @@ class TUploadPicasa:
 
 		if response['status'] == '200':
 			self.authtoken = re.search('Auth=(\S*)', content).group(1)
-		else:
-			self.authtoken = None
 
 #		fauth = open('/tmp/googleauth', mode='w')
 #		fauth.write(self.authtoken);
@@ -134,6 +135,11 @@ class TUploadPicasa:
 	#  Upload the given file
 	#
 	def upload( self, filename ):
+		if not self.authtoken:
+			raise TUPError("Not logged in while attempting upload")
+		if not self.options.targetalbum:
+			raise TUPError("You must supply an album name to upload to")
+
 		if self.options.targetsize :
 			if self.options.verbose:
 				print "--- Converting",filename,"to be",self.options.targetsize,"wide"
@@ -271,16 +277,8 @@ Content-Type: image/jpeg
 		# Run the parser
 		(self.options, args) = parser.parse_args( self.argv[1:] )
 
-		# Ensure that we have the parameters we need
-		if not self.options.login or not self.options.password:
-			parser.error("You must supply a USERNAME and PASSWORD to login")
-
 		if len(args) != 1 or self.options.mode == 'list':
 			self.options.mode = 'list'
-			return
-
-		if not self.options.targetalbum:
-			parser.error("You must supply the name of an ALBUM to upload to")
 
 		# Copy the positional arguments into self
 		self.filenames = args
