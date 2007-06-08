@@ -175,14 +175,12 @@ Content-Type: image/jpeg
 			headers=headers,body=image )
 		if response['status'] == '404':
 			raise TUPError(content)
-		if self.options.verbose:
-			print "RX:", content
-			print "RX:", response
 
-		if self.options.verbose:
-			print "----- Fetching response"
+		# Check for a redirect
 		while response['status'] == '302':
 			response, content = http.request(response['location'], 'GET')
+			if response['status'] == '404':
+				raise TUPError(content)
 
 		if self.options.verbose:
 			print "RX:", content
