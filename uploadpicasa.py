@@ -52,6 +52,17 @@ class TUploadPicasa:
 	def __init__( self, argv ):
 		self.argv = argv
 
+		class Record:
+			pass
+
+		# Load the options record with default values
+		self.options = Record()
+		self.options.targetsize = None
+		self.options.login = None
+		self.options.password = None
+		self.options.targetalbum = None
+
+
 	#
 	# Function:		run
 	# Description:
@@ -197,16 +208,6 @@ Content-Type: image/jpeg
 	#  Read default settings from config file
 	#
 	def readConfigFile( self ):
-		class Record:
-			pass
-
-		# Load the options record with default values
-		self.options = Record()
-		self.options.targetsize = None
-		self.options.login = None
-		self.options.password = None
-		self.options.targetalbum = None
-
 		# Read overriding defaults from the config file
 		home = os.getenv('HOME');
 		try:
