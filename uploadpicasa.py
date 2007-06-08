@@ -84,12 +84,12 @@ class TUploadPicasa:
 	#  Generate an authentication token to use for subsequent requests
 	#
 	def authenticate( self ):
-		try:
-			fauth = open('/tmp/googleauth', mode='r')
-			self.authtoken = fauth.read()
-			return
-		except IOError:
-			print "--- No cached authentication token found, new login"
+#		try:
+#			fauth = open('/tmp/googleauth', mode='r')
+#			self.authtoken = fauth.read()
+#			return
+#		except IOError:
+#			print "--- No cached authentication token found, new login"
 
 		# Create the authentication request
 		auth_url = 'https://www.google.com/accounts/ClientLogin'
@@ -112,9 +112,9 @@ class TUploadPicasa:
 		else:
 			self.authtoken = None
 
-		fauth = open('/tmp/googleauth', mode='w')
-		fauth.write(self.authtoken);
-		fauth.close()
+#		fauth = open('/tmp/googleauth', mode='w')
+#		fauth.write(self.authtoken);
+#		fauth.close()
 
 	#
 	# Function:		upload
