@@ -178,7 +178,7 @@ Content-Type: image/jpeg
 
 		# Check for a redirect
 		while response['status'] == '302':
-			response, content = http.request(response['location'], 'GET')
+			response, content = self.http.request(response['location'], 'GET')
 			if response['status'] == '404':
 				raise TUPError(content)
 
