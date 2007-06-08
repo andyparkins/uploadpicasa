@@ -275,7 +275,7 @@ Content-Type: image/jpeg
 		if not self.options.targetalbum:
 			parser.error("You must supply the name of an ALBUM to upload to")
 
-		if not self.options.login or not self.options.targetalbum:
+		if not self.options.login or not self.options.password:
 			parser.error("You must supply a USERNAME and PASSWORD to login")
 
 		# Copy the positional arguments into self
