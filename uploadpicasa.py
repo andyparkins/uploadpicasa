@@ -13,7 +13,8 @@
 # Notes
 #    Adapted from snippet posted by Andrea on the dot.kde.org thread at
 #    http://dot.kde.org/1181138874/
-#    I've made it into an object oriented and use python's nice OptionParser class
+#    I've made it into an object oriented and use python's nice OptionParser
+#    class
 #
 # ----------------------------------------------------------------------------
 
