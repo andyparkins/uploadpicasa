@@ -175,10 +175,11 @@ class TUploadPicasa:
 			raise TUPError("You must supply an album name to upload to")
 
 		if self.options.targetsize :
+			tmpname = "/tmp/tmp%s" % (os.path.basename(filename))
 			if self.options.verbose:
 				print "--- Converting",filename,"to be",self.options.targetsize,"wide"
-			os.system('convert -resize %s %s /tmp/tmp.jpg' % (self.options.targetsize,filename))
-			f = open('/tmp/tmp.jpg', mode='rb')
+			os.system('convert -resize %s %s "%s"' % (self.options.targetsize,filename,tmpname))
+			f = open((tmpname), mode='rb')
 		else :
 			f = open(filename, mode='rb')
 
@@ -243,7 +244,7 @@ Content-Type: image/jpeg
 			print "RX:", response
 
 		if self.options.targetsize:
-			os.system('rm /tmp/tmp.jpg')
+			os.system('rm -f "%s"' % (tmpname))
 
 		print " - upload of", namenice, "complete"
 
